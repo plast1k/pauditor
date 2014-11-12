@@ -1,3 +1,4 @@
+
 '''
 ------------------------------------------------------------------------
 ********documentation*********
@@ -17,6 +18,8 @@ import getopt
 import sys
 import socket
 from IPy import IP
+from datetime import datetime
+
 
 #kinda global variables
 
@@ -37,6 +40,9 @@ class color:
 
 #End of color class
 
+##user interface functions these are
+#about()
+#usage()
 
 #about function to display more info about the application
 
@@ -67,6 +73,56 @@ def usage ():
     print"                 (this will check 127.0.0.1 ssh server on localhost for weak passwords \n \t\t and common Vulns)" 
     print"                or ./pauditor.py -h for help"
     print"                please make sure you give all the options"
+#END of of user interface functions
+
+#here goes main application fuctions they include
+#network_scanner()
+#ssh_brute()
+#telnet_brute()
+#shell_shock_check()
+
+
+#start of network_scanner()
+def network_scanner():
+	
+	start_time=datetime.now()
+	print color.DEFAULT_COLOR +"_" * 48 ,"\n"
+	print "Scan started at  " + str(start_time)
+	print color.RED +"Use CTRL+Z anytime to stop the scanner and exit"
+	print color.DEFAULT_COLOR +"_" * 48 ,"\n"
+	for ip in IP(remote_address):
+        	try:
+                	print info +"Testing "+ str(ip) +" ...."
+                	connection_socket=socket.socket()
+                	connection_socket.connect((str(ip),int(remote_service)))
+                	banner=connection_socket.recv(1024)
+                	connection_socket.close()
+                	if connection_socket:
+                        	print success + " Port "+str(remote_service) +" is open on " + str(ip) +color.PURPLE +" Running :----> " +color.RED+banner
+        	except:
+                	pass
+
+	stop_time=datetime.now()
+	time_taken=stop_time - start_time
+	print color.BLUE +"\n Finished in "+ str(time_taken)
+
+#END of network_scanner
+
+#start of ssh_brute()
+
+
+
+#start of telnet_brute()
+
+
+
+#start of shell_shock_check()
+
+
+
+#program entry!!
+#this is the MAIN
+
 #get option from the user
 if __name__=='__main__':
     if len(sys.argv)<3:
@@ -99,9 +155,6 @@ if __name__=='__main__':
                 sys.exit(0)
     except:
         exit(0)
-
-###soon to be made validate function
-
  
 #sanitize user unput first to make sure they don't give gabbage
 ##check IP address formart first,check the service next and vulnerability scan last but first we fire up the about()
@@ -148,4 +201,8 @@ if check_vulns == 'yes' :
 if check_vulns == 'no' :
 	print success + "Light vulnerability check has been disabled....."
 
-#END of validation
+print "\n"
+#END of validations
+#call the scanner
+network_scanner()
+
