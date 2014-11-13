@@ -1,4 +1,3 @@
-
 '''
 ------------------------------------------------------------------------
 ********documentation*********
@@ -26,6 +25,7 @@ from datetime import datetime
 check_vulns='no'
 remote_address=''
 remote_service=''
+target_host_list=[]
 
 # define some colors in a class just to be flushy
 
@@ -99,14 +99,20 @@ def network_scanner():
                 	connection_socket.close()
                 	if connection_socket:
                         	print success + " Port "+str(remote_service) +" is open on " + str(ip) +color.PURPLE +" Running :----> " +color.RED+banner
+				target_host_list.append(str(ip))
+				print success + color.PURPLE +"\'"+ str(ip) + "\' Added to the DB"
         	except:
                 	pass
 
 	stop_time=datetime.now()
 	time_taken=stop_time - start_time
-	print color.BLUE +"\n Finished in "+ str(time_taken)
+	if len(target_host_list)==0:
+		print fail + "No hosts were found with open port " +remote_service
+	else:
+		print success + str(len(target_host_list))+ " Total hosts added to the DB ready for auditing.."
+	print color.BLUE +"\n Scanning finished in "+ str(time_taken)
 
-#END of network_scanner
+
 
 #start of ssh_brute()
 
@@ -117,6 +123,13 @@ def network_scanner():
 
 
 #start of shell_shock_check()
+
+
+
+
+
+
+
 
 
 
@@ -205,4 +218,3 @@ print "\n"
 #END of validations
 #call the scanner
 network_scanner()
-
