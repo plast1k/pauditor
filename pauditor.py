@@ -5,7 +5,7 @@
 This is python tool meant to audit weak SSH and Telnet password in the network
 NB:only if these services are using standard ports 
 ------------------------------------------------------------------------
-author:plast1k https://github.com/plast1k/
+author:plast1k
 
 '''
 
@@ -56,7 +56,7 @@ def about():
     print color.BLUE +"\t###################################################################"
     print color.BLUE +"\t#"+ color.RED +"============++++++"+color.GREEN +" pauditor.py ver 0.1 "+color.RED +"++++++++++================"+color.RED +color.BLUE+"#"
     color.DEFAULT_COLOR
-    print color.BLUE +"\t#"+ color.PINK +"------------ by plast1k https://github.com/plast1k --------------"+color.BLUE +"#"
+    print color.BLUE +"\t#"+ color.PINK +"------------------------- by plast1k ----------------------------"+color.BLUE +"#"
     print color.BLUE +"\t#"+ color.PINK +"=============++++++++++++++++++++++++++++++++++++++=============="+color.BLUE +"#"
     print color.BLUE +"\t###################################################################"
     print color.DEFAULT_COLOR
